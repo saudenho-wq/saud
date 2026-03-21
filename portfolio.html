@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Cairo:wght@300;400;600;700&family=Tajawal:wght@300;400;700&family=IBM+Plex+Sans+Arabic:wght@300;400;700&family=DM+Sans:wght@400;500;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#070709;--s1:#0c0c10;--s2:#111116;--s3:#18181f;
+  --border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.1);
+  --accent:#6c63ff;--accent2:#9d97ff;--accent3:#3d38b0;
+  --cyan:#00d4ff;--text:#f0eeff;--sub:#8888aa;--muted:#444458;
+  --red:#ff4d6d;--green:#00e5a0;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font,'Cairo'),sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* PROFILE IMAGE */
+.profile-img-wrap{position:relative;width:100%;height:220px;border-radius:16px;overflow:hidden;background:var(--s3);border:1px solid var(--border2);margin-bottom:28px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.profile-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+.profile-img-placeholder{display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--muted)}
+.profile-img-placeholder .pi-icon{font-size:40px}
+.profile-img-placeholder span{font-size:13px}
+.profile-img-overlay{position:absolute;inset:0;background:rgba(0,0,0,.5);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;opacity:0;transition:opacity .2s;color:#fff;font-size:13px;font-weight:700}
+.profile-img-wrap:hover .profile-img-overlay{opacity:1}
+
+/* HERO PROFILE IMAGE */
+.hero-profile{position:absolute;left:40px;top:50%;transform:translateY(-50%);width:160px;height:160px;border-radius:20px;overflow:hidden;border:2px solid rgba(108,99,255,.3);box-shadow:0 8px 32px rgba(0,0,0,.5);transition:left .3s,right .3s}
+.hero-profile img{width:100%;height:100%;object-fit:cover}
+.hero-profile-empty{width:100%;height:100%;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:48px;color:var(--muted)}
+.hero.has-profile .hero-c{padding-left:200px}
+[dir="ltr"] .hero-profile{left:auto;right:40px}
+[dir="ltr"] .hero.has-profile .hero-c{padding-left:0;padding-right:200px}
+
+/* FONT PICKER */
+.font-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.font-opt{padding:14px 12px;border-radius:10px;border:1px solid var(--border);background:var(--s3);cursor:pointer;text-align:center;transition:all .2s}
+.font-opt:hover{border-color:rgba(108,99,255,.4)}
+.font-opt.on{border-color:var(--accent);background:rgba(108,99,255,.12)}
+.font-opt .fo-name{font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px}
+.font-opt .fo-label{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+
+/* LANG TOGGLE */
+.lang-toggle{display:flex;gap:0;border-radius:10px;overflow:hidden;border:1px solid var(--border2);width:fit-content}
+.lang-btn{padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;background:var(--s3);color:var(--sub);border:none;font-family:'Cairo',sans-serif;transition:all .2s}
+.lang-btn.on{background:var(--accent);color:#fff}
+.lang-btn:first-child{border-left:1px solid var(--border2)}
+
+/* AMBIENT */
+.amb{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.amb div{position:absolute;border-radius:50%;filter:blur(120px);animation:drift 12s ease-in-out infinite alternate}
+.a1{width:500px;height:500px;background:var(--accent);opacity:.15;top:-150px;right:-100px}
+.a2{width:400px;height:400px;background:var(--cyan);opacity:.08;bottom:-100px;left:-100px;animation-delay:-6s}
+.a3{width:300px;height:300px;background:#ff6b9d;opacity:.06;top:50%;left:30%;animation-delay:-3s}
+@keyframes drift{0%{transform:translate(0,0) scale(1)}100%{transform:translate(40px,30px) scale(1.1)}}
+
+/* LOGIN SCREEN */
+#loginScreen{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;padding:24px;
+}
+#loginScreen.gone{display:none}
+.login-box{
+  width:100%;max-width:420px;
+  background:var(--s1);border:1px solid var(--border2);
+  border-radius:24px;padding:40px;
+  box-shadow:0 40px 80px rgba(0,0,0,.7);
+  position:relative;overflow:hidden;
+  animation:up .4s ease;
+}
+.login-box::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(108,99,255,.6),transparent)}
+.login-glow{position:absolute;top:-80px;right:-80px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(108,99,255,.18),transparent 70%);pointer-events:none}
+.l-icon{width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,var(--accent),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:20px}
+.l-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--text);margin-bottom:6px}
+.l-sub{font-size:13px;color:var(--sub);line-height:1.7;margin-bottom:28px}
+.l-err{background:rgba(255,77,109,.1);border:1px solid rgba(255,77,109,.3);color:var(--red);font-size:13px;padding:10px 14px;border-radius:10px;margin-bottom:16px;display:none}
+.l-err.show{display:block}
+.l-label{font-size:11px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;font-weight:700;display:block;margin-bottom:8px}
+.l-input{width:100%;background:var(--s3);border:1px solid var(--border2);border-radius:10px;padding:12px 16px;color:var(--text);font-family:'Cairo',sans-serif;font-size:14px;outline:none;margin-bottom:16px;transition:border-color .2s}
+.l-input:focus{border-color:rgba(108,99,255,.5);box-shadow:0 0 0 3px rgba(108,99,255,.1)}
+.l-divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:var(--muted);font-size:12px}
+.l-divider::before,.l-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 20px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .2s;font-family:'Cairo',sans-serif;width:100%;margin-bottom:0}
+.btn-p{background:linear-gradient(135deg,var(--accent),#8b84ff);color:#fff;box-shadow:0 4px 20px rgba(108,99,255,.3)}
+.btn-p:hover{opacity:.88;transform:translateY(-1px)}
+.btn-g{background:rgba(255,255,255,.04);color:var(--sub);border:1px solid var(--border2)}
+.btn-g:hover{color:var(--text);border-color:rgba(255,255,255,.15)}
+.btn-danger{background:rgba(255,77,109,.1);color:var(--red);border:1px solid rgba(255,77,109,.2)}
+.btn-danger:hover{background:rgba(255,77,109,.2)}
+.btn-sm{width:auto;padding:8px 16px;font-size:13px}
+.btn-accent{background:rgba(108,99,255,.1);color:var(--accent2);border:1px solid rgba(108,99,255,.3)}
+.btn-accent:hover{background:rgba(108,99,255,.18)}
+
+/* APP */
+#app{display:none;position:relative;z-index:1}
+#app.visible{display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{
+  width:260px;min-height:100vh;
+  background:rgba(12,12,16,.9);backdrop-filter:blur(24px);
+  border-left:1px solid var(--border);
+  display:flex;flex-direction:column;
+  position:fixed;top:0;right:0;bottom:0;z-index:100;
+}
+.sb-top{padding:28px 24px 20px}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:0}
+.brand-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.brand-name{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;color:var(--text);line-height:1}
+.brand-sub{font-size:11px;color:var(--sub);margin-top:2px;letter-spacing:1px}
+.nav{padding:20px 12px 0;flex:1;overflow:hidden}
+.nav-sec{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;padding:0 12px;margin:0 0 8px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;color:var(--sub);transition:all .2s;margin-bottom:2px;border:1px solid transparent;position:relative;white-space:nowrap;overflow:hidden}
+.nav-item:hover{color:var(--text);background:rgba(255,255,255,.04)}
+.nav-item.on{color:var(--text);background:rgba(108,99,255,.15);border-color:rgba(108,99,255,.25)}
+.nav-item.on::before{content:'';position:absolute;right:0;top:50%;transform:translateY(-50%);width:3px;height:18px;border-radius:2px;background:linear-gradient(to bottom,var(--accent),var(--cyan))}
+.nav-ic{font-size:14px;width:16px;text-align:center;flex-shrink:0}
+.nav-txt{flex:1;overflow:hidden;text-overflow:ellipsis}
+.nbadge{flex-shrink:0;background:var(--accent3);color:var(--accent2);font-size:10px;padding:2px 6px;border-radius:20px}
+.sb-footer{padding:16px 20px;border-top:1px solid var(--border)}
+.cpill{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--border2);font-size:12px;color:var(--sub);margin-bottom:7px;text-decoration:none;transition:all .2s;overflow:hidden}
+.cpill span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cpill:hover{color:var(--text);border-color:rgba(108,99,255,.3)}
+/* lang toggle in sidebar */
+.sb-lang{display:flex;gap:0;border-radius:8px;overflow:hidden;border:1px solid var(--border2);margin-bottom:10px;width:100%}
+.sb-lang-btn{flex:1;padding:8px 0;font-size:12px;font-weight:700;cursor:pointer;background:var(--s3);color:var(--sub);border:none;font-family:'Cairo',sans-serif;transition:all .2s;text-align:center}
+.sb-lang-btn.on{background:var(--accent);color:#fff}
+/* admin login button - ALWAYS visible to guests */
+#adminLoginBtn{margin-top:6px}
+/* admin panel footer - hidden by default */
+#adminPanel{display:none;margin-top:6px}
+.abadge{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--accent2);background:rgba(108,99,255,.12);border:1px solid rgba(108,99,255,.25);padding:3px 10px;border-radius:20px;font-weight:700;letter-spacing:1px;margin-bottom:8px}
+.logout-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:9px;border-radius:10px;background:rgba(255,77,109,.08);border:1px solid rgba(255,77,109,.2);color:var(--red);font-size:13px;cursor:pointer;transition:all .2s;font-family:'Cairo',sans-serif;font-weight:700}
+.logout-btn:hover{background:rgba(255,77,109,.18)}
+
+/* MAIN */
+.main{margin-right:260px;flex:1;min-height:100vh}
+.topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:14px 36px;background:rgba(7,7,9,.8);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.crumb{font-size:12px;color:var(--muted)}
+.crumb span{color:var(--sub)}
+.tbar-right{display:flex;align-items:center;gap:8px}
+#tbAdminBadge{display:none}
+/* admin topbar buttons hidden by default */
+#tbAdminBtns{display:none}
+
+/* PAGES */
+.page{display:none;padding:36px;animation:up .3s ease}
+.page.on{display:block}
+@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* HERO */
+.hero{position:relative;border-radius:20px;overflow:hidden;padding:52px 48px;margin-bottom:28px;background:var(--s1);border:1px solid var(--border2)}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 100% at 90% 0%,rgba(108,99,255,.15),transparent 60%),radial-gradient(ellipse 40% 60% at 10% 100%,rgba(0,212,255,.06),transparent)}
+.hero-mesh{position:absolute;top:0;right:0;width:300px;height:100%;opacity:.04;background-image:linear-gradient(var(--accent) 1px,transparent 1px),linear-gradient(90deg,var(--accent) 1px,transparent 1px);background-size:32px 32px;mask-image:linear-gradient(to left,black,transparent)}
+.hero-c{position:relative;z-index:1}
+.hero-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;letter-spacing:2px;color:var(--accent2);text-transform:uppercase;margin-bottom:16px;background:rgba(108,99,255,.1);padding:5px 12px;border-radius:20px;border:1px solid rgba(108,99,255,.2)}
+.hero-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(34px,4vw,54px);line-height:1.05;color:var(--text);margin-bottom:12px;letter-spacing:-1px}
+.grad{background:linear-gradient(90deg,var(--accent2),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:15px;color:var(--sub);line-height:1.7;max-width:480px}
+.hero-btns{display:flex;gap:10px;margin-top:28px}
+/* hero admin buttons hidden by default */
+#heroAdminBtns{display:none}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:36px}
+.stat{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:22px 24px;transition:border-color .25s,transform .2s;position:relative;overflow:hidden}
+.stat::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(108,99,255,.4),transparent);opacity:0;transition:opacity .3s}
+.stat:hover{border-color:rgba(108,99,255,.3);transform:translateY(-2px)}
+.stat:hover::after{opacity:1}
+.stat-lbl{font-size:11px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px}
+.stat-num{font-family:'Syne',sans-serif;font-size:38px;font-weight:800;color:var(--text);line-height:1}
+.stat-sub{font-size:12px;color:var(--green);margin-top:8px}
+
+/* SECTION */
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.sec-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text)}
+.sec-cnt{font-size:12px;color:var(--muted);background:var(--s2);padding:3px 10px;border-radius:20px;border:1px solid var(--border)}
+
+/* TABS */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px}
+.tab{padding:6px 16px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--s1);color:var(--sub);transition:all .2s}
+.tab:hover{color:var(--text)}
+.tab.on{background:rgba(108,99,255,.15);border-color:rgba(108,99,255,.4);color:var(--accent2)}
+
+/* WORKS GRID */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.wcard{background:var(--s1);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:all .3s cubic-bezier(.22,1,.36,1);cursor:pointer}
+.wcard:hover{border-color:rgba(108,99,255,.35);transform:translateY(-5px);box-shadow:0 24px 48px rgba(0,0,0,.5)}
+.wthumb{width:100%;aspect-ratio:16/10;background:var(--s3);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.wthumb img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.wcard:hover .wthumb img{transform:scale(1.05)}
+.wthumb-empty{display:flex;flex-direction:column;align-items:center;gap:8px}
+.t-icon{width:52px;height:52px;border-radius:14px;background:var(--s2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:22px}
+.t-lbl{font-size:12px;color:var(--muted)}
+.woverlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(7,7,9,.85) 30%,transparent);opacity:0;transition:opacity .3s;display:flex;align-items:flex-end;padding:16px}
+.wcard:hover .woverlay{opacity:1}
+.ov-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);backdrop-filter:blur(8px);color:#fff;font-size:12px;padding:7px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.15);font-weight:700}
+.wbody{padding:18px 20px 16px}
+.wcat{display:inline-block;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent2);background:rgba(108,99,255,.1);padding:3px 9px;border-radius:6px;margin-bottom:10px;font-weight:700}
+.wtitle{font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;line-height:1.4}
+.wdesc{font-size:12px;color:var(--sub);line-height:1.7;margin-bottom:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.wmeta{display:flex;align-items:center;justify-content:space-between}
+.like-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--sub);font-size:12px;cursor:pointer;transition:all .2s;font-family:'Cairo',sans-serif;font-weight:700}
+.like-btn:hover,.like-btn.liked{border-color:rgba(255,77,109,.5);color:var(--red);background:rgba(255,77,109,.1)}
+@keyframes pop{0%,100%{transform:scale(1)}40%{transform:scale(1.3)}}
+.like-btn.liked{animation:pop .3s ease}
+.wdate{font-size:11px;color:var(--muted)}
+
+/* EMPTY */
+.empty{text-align:center;padding:80px 0;grid-column:1/-1}
+.empty-ic{font-size:52px;margin-bottom:16px;opacity:.25}
+.empty-t{font-size:18px;color:var(--sub);margin-bottom:8px;font-weight:700}
+.empty-s{font-size:13px;color:var(--muted)}
+
+/* UPLOAD */
+.dropzone{border:2px dashed rgba(108,99,255,.25);border-radius:20px;padding:60px;text-align:center;cursor:pointer;transition:all .3s;margin-bottom:24px;background:rgba(108,99,255,.02)}
+.dropzone:hover,.dropzone.drag{border-color:rgba(108,99,255,.5);background:rgba(108,99,255,.06)}
+.dz-ic{width:72px;height:72px;border-radius:20px;background:rgba(108,99,255,.1);border:1px solid rgba(108,99,255,.25);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 20px}
+.dz-t{font-size:20px;font-weight:700;color:var(--text);margin-bottom:8px}
+.dz-s{font-size:13px;color:var(--sub);line-height:1.7}
+
+/* CARD */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:18px;padding:28px;margin-bottom:20px}
+.card-t{font-size:14px;font-weight:700;color:var(--text);margin-bottom:22px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.fg{margin-bottom:18px}
+.fl{font-size:11px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;display:block;font-weight:700}
+.fi,.fs,.ft{width:100%;background:var(--s3);border:1px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--text);font-family:'Cairo',sans-serif;font-size:14px;transition:border-color .2s,box-shadow .2s;outline:none}
+.fi:focus,.fs:focus,.ft:focus{border-color:rgba(108,99,255,.5);box-shadow:0 0 0 3px rgba(108,99,255,.1)}
+.fs option{background:var(--s2)}
+.ft{resize:vertical;min-height:96px}
+.prev-wrap{border-radius:12px;overflow:hidden;border:1px solid var(--border);margin-bottom:18px;display:none}
+
+/* ANALYTICS */
+.agrid{display:grid;grid-template-columns:3fr 2fr;gap:20px;margin-bottom:20px}
+.chart-area{display:flex;align-items:flex-end;gap:10px;height:160px}
+.bar-col{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1}
+.bar-track{flex:1;width:100%;display:flex;align-items:flex-end}
+.bar-fill{width:100%;border-radius:6px;background:linear-gradient(to top,var(--accent3),var(--accent));min-height:4px;cursor:pointer;transition:height .6s cubic-bezier(.34,1.56,.64,1)}
+.bar-fill:hover{background:linear-gradient(to top,var(--accent),var(--accent2))}
+.bar-day{font-size:10px;color:var(--muted)}
+.donut-wrap{display:flex;flex-direction:column;align-items:center;padding:12px 0}
+.donut-svg{position:relative;width:130px;height:130px}
+.donut-svg svg{width:100%;height:100%;transform:rotate(-90deg)}
+.donut-in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.donut-n{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--text)}
+.donut-l{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.legend{margin-top:20px;width:100%}
+.leg-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px}
+.leg-left{display:flex;align-items:center;gap:8px}
+.leg-dot{width:8px;height:8px;border-radius:50%}
+.leg-cnt{color:var(--sub)}
+.dtable{width:100%;border-collapse:collapse}
+.dtable th{text-align:right;padding:10px 16px;font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border);font-weight:700}
+.dtable td{padding:13px 16px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.04)}
+.dtable tr:hover td{background:rgba(108,99,255,.04)}
+.td-cat{display:inline-block;font-size:10px;padding:3px 9px;border-radius:6px;background:rgba(108,99,255,.1);color:var(--accent2);font-weight:700}
+.td-lk{color:var(--red);font-weight:700}
+
+/* MANAGE */
+.mrow{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}
+.mthumb{width:52px;height:40px;border-radius:8px;background:var(--s3);border:1px solid var(--border);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--muted)}
+.mthumb img{width:100%;height:100%;object-fit:cover}
+.minfo{flex:1}
+.mname{font-size:14px;font-weight:700;color:var(--text)}
+.mmeta{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(12px);z-index:500;align-items:center;justify-content:center;padding:24px}
+.modal-bg.on{display:flex}
+.modal{background:var(--s1);border:1px solid var(--border2);border-radius:20px;padding:36px;max-width:560px;width:100%;animation:up .3s ease;box-shadow:0 40px 80px rgba(0,0,0,.7)}
+.modal-hd{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text)}
+.modal-x{background:none;border:none;color:var(--sub);cursor:pointer;font-size:20px;padding:4px}
+.modal-x:hover{color:var(--text)}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--s2);border:1px solid rgba(108,99,255,.3);box-shadow:0 8px 32px rgba(0,0,0,.5);color:var(--text);padding:12px 24px;border-radius:12px;font-size:14px;z-index:9000;display:flex;align-items:center;gap:8px;transition:transform .4s cubic-bezier(.22,1,.36,1),opacity .4s;opacity:0;pointer-events:none;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* MOBILE */
+.mob-bar{display:none;position:fixed;top:0;left:0;right:0;z-index:98;background:rgba(7,7,9,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:12px 20px;align-items:center;justify-content:space-between}
+.mob-menu{background:var(--s2);border:1px solid var(--border2);color:var(--text);width:38px;height:38px;border-radius:8px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99;backdrop-filter:blur(4px)}
+
+@media(max-width:768px){
+  .sidebar{transform:translateX(100%);transition:transform .35s cubic-bezier(.22,1,.36,1)}
+  .sidebar.open{transform:translateX(0)}
+  .sb-overlay{display:block;opacity:0;pointer-events:none;transition:opacity .35s}
+  .sb-overlay.show{opacity:1;pointer-events:auto}
+  .main{margin-right:0;padding-top:62px}
+  .topbar{display:none}
+  .mob-bar{display:flex}
+  /* hero */
+  .hero{padding:28px 20px}
+  .hero-profile{width:80px;height:80px;left:16px;bottom:16px;top:auto;transform:none}
+  [dir="ltr"] .hero-profile{right:16px;left:auto}
+  .hero.has-profile .hero-c{padding-left:100px;padding-bottom:0}
+  [dir="ltr"] .hero.has-profile .hero-c{padding-right:100px;padding-left:0}
+  .hero-title{font-size:28px}
+  .hero-sub{font-size:13px}
+  .hero-btns{flex-wrap:wrap;gap:8px}
+  /* stats */
+  .stats{grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
+  .stat{padding:16px}
+  .stat-num{font-size:28px}
+  /* grid */
+  .grid{grid-template-columns:1fr 1fr}
+  /* analytics */
+  .agrid{grid-template-columns:1fr}
+  /* pages */
+  .page{padding:16px}
+  .frow{grid-template-columns:1fr}
+  .card{padding:20px}
+  /* tabs */
+  .tabs{gap:4px}
+  .tab{padding:5px 12px;font-size:11px}
+  /* dropzone */
+  .dropzone{padding:36px 20px}
+}
+@media(max-width:480px){
+  .grid{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr}
+  .hero-title{font-size:24px}
+  .stat-num{font-size:24px}
+  .mob-bar{padding:10px 16px}
+}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--s3);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- AMBIENT -->
+<div class="amb"><div class="a1"></div><div class="a2"></div><div class="a3"></div></div>
+
+<!-- ═══════ LOGIN SCREEN ═══════ -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-glow"></div>
+    <div class="l-icon">🎨</div>
+    <div class="l-title">مرحباً بك</div>
+    <div class="l-sub">اختر طريقة الدخول — الآدمن يملك صلاحيات كاملة، الزائر يشوف المعرض فقط</div>
+    <div class="l-err" id="lErr">❌ كلمة المرور غير صحيحة</div>
+    <label class="l-label">كلمة مرور الآدمن</label>
+    <input class="l-input" type="password" id="lPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn btn-p" onclick="doLogin()">⚡ دخول كآدمن</button>
+    <div class="l-divider">أو</div>
+    <button class="btn btn-g" onclick="guestIn()">👁 تصفح كزائر</button>
+  </div>
+</div>
+
+<!-- ═══════ APP ═══════ -->
+<div id="app">
+
+  <!-- MOBILE BAR -->
+  <div class="mob-bar">
+    <button class="mob-menu" onclick="sbOpen()">☰</button>
+    <div id="mobName" style="font-family:'Syne',sans-serif;font-weight:800;font-size:15px">Portfolio</div>
+    <button class="btn btn-accent btn-sm" id="mobLoginBtn" onclick="showLogin()">🔐 دخول</button>
+  </div>
+  <div class="sb-overlay" id="sbOverlay" onclick="sbClose()"></div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sb">
+    <div class="sb-top">
+      <div class="brand">
+        <div class="brand-icon">✦</div>
+        <div>
+          <div class="brand-name" id="sbName">Portfolio</div>
+          <div class="brand-sub">Creative Studio</div>
+        </div>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-sec" id="ns0">القائمة</div>
+      <div class="nav-item on" id="ni0" onclick="go('portfolio',0)">
+        <span class="nav-ic">⊞</span><span class="nav-txt">معرض الأعمال</span>
+        <span class="nbadge" id="nbadge">0</span>
+      </div>
+      <div class="nav-item" id="ni1" onclick="go('upload',1)" style="display:none">
+        <span class="nav-ic">＋</span><span class="nav-txt">رفع عمل جديد</span>
+      </div>
+      <div class="nav-sec" id="mgSec" style="display:none;margin-top:24px">الإدارة</div>
+      <div class="nav-item" id="ni2" onclick="go('analytics',2)" style="display:none">
+        <span class="nav-ic">◈</span><span class="nav-txt">التحليلات</span>
+      </div>
+      <div class="nav-item" id="ni3" onclick="go('settings',3)" style="display:none">
+        <span class="nav-ic">◎</span><span class="nav-txt">الإعدادات</span>
+      </div>
+    </nav>
+    <div class="sb-footer">
+      <!-- Language toggle - always visible for all users -->
+      <div class="sb-lang">
+        <button class="sb-lang-btn on" id="sbLangAr" onclick="setLang('ar')">العربية</button>
+        <button class="sb-lang-btn" id="sbLangEn" onclick="setLang('en')">English</button>
+      </div>
+      <a class="cpill" id="sbPhone" href="#"><span>📞</span><span id="phTxt">لم يُضف رقم بعد</span></a>
+      <a class="cpill" id="sbEmail" href="#"><span>✉</span><span id="emTxt">لم يُضف إيميل بعد</span></a>
+      <div id="adminLoginBtn">
+        <button onclick="showLogin()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;border-radius:10px;background:rgba(108,99,255,.08);border:1px solid rgba(108,99,255,.3);color:var(--accent2);font-size:12px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif;transition:background .2s" onmouseover="this.style.background='rgba(108,99,255,.16)'" onmouseout="this.style.background='rgba(108,99,255,.08)'" id="adminLoginBtnInner">
+          🔐 دخول كآدمن
+        </button>
+      </div>
+      <div id="adminPanel" style="display:none">
+        <div class="abadge" id="abadgeTxt">⚡ أنت الآدمن</div>
+        <button class="logout-btn" onclick="doLogout()" id="logoutBtnTxt">🚪 تسجيل الخروج</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- TOPBAR (desktop) -->
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="crumb">Studio <span>/ <span id="crumbTxt">أعمالي</span></span></div>
+        <span id="tbAdminBadge" style="display:none;font-size:10px;color:var(--accent2);background:rgba(108,99,255,.12);border:1px solid rgba(108,99,255,.25);padding:3px 10px;border-radius:20px;font-weight:700">⚡ آدمن</span>
+      </div>
+      <div class="tbar-right">
+        <div class="lang-toggle">
+          <button class="lang-btn on" id="langAr" onclick="setLang('ar')">العربية</button>
+          <button class="lang-btn" id="langEn" onclick="setLang('en')">English</button>
+        </div>
+        <button id="tbLoginBtn" onclick="showLogin()" class="btn btn-accent btn-sm">🔐 دخول كآدمن</button>
+        <div id="tbAdminBtns" style="display:none;gap:8px;align-items:center">
+          <button class="btn btn-g btn-sm" onclick="go('analytics',2)" id="tb_reports">◈ التقارير</button>
+          <button class="btn btn-p btn-sm" onclick="go('upload',1)" id="tb_upload">+ رفع عمل</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: PORTFOLIO -->
+    <div class="page on" id="pg-portfolio">
+      <div class="hero" id="heroEl">
+        <div class="hero-mesh"></div>
+        <div class="hero-profile" id="heroProfile">
+          <div class="hero-profile-empty" id="heroProfileEmpty">👤</div>
+          <img id="heroProfileImg" style="display:none">
+        </div>
+        <div class="hero-c" id="heroContent">
+          <div class="hero-tag">✦ Creative Portfolio</div>
+          <div class="hero-title"><span id="hName" class="grad">أعمالي</span><span id="hTitleSub"><br>الإبداعية</span></div>
+          <div class="hero-sub" id="hTagline">مصمم إبداعي متخصص في الهوية البصرية والجرافيك ديزاين</div>
+          <div id="heroAdminBtns" style="display:none;gap:10px;margin-top:28px">
+            <button class="btn btn-p btn-sm" onclick="go('upload',1)" id="btnAddWork">+ أضف عمل</button>
+            <button class="btn btn-g btn-sm" onclick="go('analytics',2)" id="btnReports">◈ التقارير</button>
+          </div>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="stat-lbl">👁 إجمالي الزيارات</div><div class="stat-num" id="stV">0</div><div class="stat-sub">↑ يتحدث تلقائياً</div></div>
+        <div class="stat"><div class="stat-lbl">⊞ الأعمال المنشورة</div><div class="stat-num" id="stW">0</div><div class="stat-sub">↑ في المعرض</div></div>
+        <div class="stat"><div class="stat-lbl">♥ إجمالي الإعجابات</div><div class="stat-num" id="stL">0</div><div class="stat-sub">↑ من الزوار</div></div>
+        <div class="stat"><div class="stat-lbl">🏆 أعلى إعجاباً</div><div class="stat-num" style="font-size:15px;padding-top:8px" id="stT">—</div><div class="stat-sub">الأكثر تفاعلاً</div></div>
+      </div>
+      <div class="sec-hd">
+        <div class="sec-title">الأعمال <span class="sec-cnt" id="wCnt">0 عمل</span></div>
+      </div>
+      <div class="tabs">
+        <div class="tab on" onclick="filter('',this)">الكل</div>
+        <div class="tab" onclick="filter('هوية بصرية',this)">هوية بصرية</div>
+        <div class="tab" onclick="filter('موشن جرافيك',this)">موشن جرافيك</div>
+        <div class="tab" onclick="filter('تصميم UI',this)">تصميم UI</div>
+        <div class="tab" onclick="filter('إعلانات',this)">إعلانات</div>
+        <div class="tab" onclick="filter('أخرى',this)">أخرى</div>
+      </div>
+      <div class="grid" id="wGrid"></div>
+    </div>
+
+    <!-- PAGE: UPLOAD -->
+    <div class="page" id="pg-upload">
+      <div class="dropzone" id="dz" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="onDrop(event)">
+        <div class="dz-ic">⬆</div>
+        <div class="dz-t">اسحب ملفك هنا</div>
+        <div class="dz-s">صور، فيديو، PDF، ملفات تصميم</div>
+        <input type="file" id="fInput" style="display:none" accept="image/*,video/*,.pdf" onchange="onFile(event)">
+        <button class="btn btn-p btn-sm" style="margin-top:20px;width:auto" onclick="document.getElementById('fInput').click()">اختر ملف</button>
+      </div>
+      <div class="card">
+        <div class="card-t">⊞ تفاصيل العمل</div>
+        <div class="prev-wrap" id="prevWrap"><div id="prevContent"></div></div>
+        <div class="frow">
+          <div class="fg"><label class="fl">اسم العمل *</label><input class="fi" id="iTitle" placeholder="مثال: هوية شركة النخيل"></div>
+          <div class="fg"><label class="fl">الفئة</label>
+            <select class="fs" id="iCat">
+              <option value="هوية بصرية">هوية بصرية</option>
+              <option value="موشن جرافيك">موشن جرافيك</option>
+              <option value="تصميم UI">تصميم UI</option>
+              <option value="إعلانات">إعلانات</option>
+              <option value="أخرى">أخرى</option>
+            </select>
+          </div>
+        </div>
+        <div class="fg"><label class="fl">الوصف</label><textarea class="ft" id="iDesc" placeholder="وصف مختصر..."></textarea></div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-p btn-sm" onclick="addWork()">✦ نشر العمل</button>
+          <button class="btn btn-g btn-sm" onclick="resetUpload()">مسح</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: ANALYTICS -->
+    <div class="page" id="pg-analytics">
+      <div style="margin-bottom:24px">
+        <button class="btn btn-g btn-sm" onclick="go('portfolio',0)">← الرجوع للمعرض</button>
+      </div>
+      <div class="agrid">
+        <div class="card"><div class="card-t">📈 الزيارات — آخر 7 أيام</div><div class="chart-area" id="barChart"></div></div>
+        <div class="card"><div class="card-t">◎ توزيع الأعمال</div>
+          <div class="donut-wrap">
+            <div class="donut-svg">
+              <svg viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="38" fill="none" stroke="var(--s3)" stroke-width="14"/>
+                <circle id="dArc" cx="50" cy="50" r="38" fill="none" stroke="url(#dg)" stroke-width="14" stroke-dasharray="239" stroke-dashoffset="60" stroke-linecap="round"/>
+                <defs><linearGradient id="dg" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="var(--accent)"/><stop offset="100%" stop-color="var(--cyan)"/></linearGradient></defs>
+              </svg>
+              <div class="donut-in"><div class="donut-n" id="dNum">0</div><div class="donut-l">عمل</div></div>
+            </div>
+            <div class="legend" id="dLeg"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-t">⊞ تفاصيل الأعمال والتفاعل</div>
+        <table class="dtable"><thead><tr><th>العمل</th><th>الفئة</th><th>الإعجابات</th><th>التاريخ</th></tr></thead>
+        <tbody id="wTbl"></tbody></table>
+      </div>
+    </div>
+
+    <!-- PAGE: SETTINGS -->
+    <div class="page" id="pg-settings">
+      <!-- Profile Image -->
+      <div class="card">
+        <div class="card-t">🖼 صورة العرض الشخصية</div>
+        <input type="file" id="profileInput" style="display:none" accept="image/*" onchange="uploadProfile(event)">
+        <div class="profile-img-wrap" onclick="document.getElementById('profileInput').click()">
+          <div class="profile-img-placeholder" id="profilePlaceholder">
+            <div class="pi-icon">👤</div>
+            <span>اضغط لرفع صورتك الشخصية</span>
+          </div>
+          <img id="profilePreview" style="display:none">
+          <div class="profile-img-overlay">
+            <div style="font-size:28px">📷</div>
+            <div>تغيير الصورة</div>
+          </div>
+        </div>
+        <button class="btn btn-danger btn-sm" id="removeProfileBtn" style="display:none" onclick="removeProfile()">🗑 حذف الصورة</button>
+      </div>
+
+      <!-- Personal Info -->
+      <div class="card">
+        <div class="card-t">◎ المعلومات الشخصية</div>
+        <div class="frow">
+          <div class="fg"><label class="fl" id="lbl_name">الاسم / المسمى المهني</label><input class="fi" id="sName" placeholder="اسمك أو لقبك المهني"></div>
+          <div class="fg"><label class="fl" id="lbl_tag">التخصص</label><input class="fi" id="sTag" placeholder="مثال: مصمم جرافيك إبداعي"></div>
+        </div>
+        <div class="frow">
+          <div class="fg"><label class="fl">📞 <span id="lbl_ph">رقم التواصل</span></label><input class="fi" id="sPh" placeholder="+966 5X XXX XXXX" dir="ltr"></div>
+          <div class="fg"><label class="fl">✉ <span id="lbl_em">البريد الإلكتروني</span></label><input class="fi" id="sEm" placeholder="email@example.com" dir="ltr"></div>
+        </div>
+        <button class="btn btn-p btn-sm" onclick="saveSettings()" id="btn_saveSettings">حفظ التغييرات</button>
+      </div>
+
+      <!-- Font Picker -->
+      <div class="card">
+        <div class="card-t" id="lbl_fontTitle">🔤 اختر الخط</div>
+        <div class="font-grid" id="fontGrid">
+          <div class="font-opt on" onclick="setFont('Cairo','Cairo')" data-font="Cairo">
+            <div class="fo-name" style="font-family:'Cairo'">القاهرة</div>
+            <div class="fo-label">Cairo</div>
+          </div>
+          <div class="font-opt" onclick="setFont('Tajawal','Tajawal')" data-font="Tajawal">
+            <div class="fo-name" style="font-family:'Tajawal'">تجوّل</div>
+            <div class="fo-label">Tajawal</div>
+          </div>
+          <div class="font-opt" onclick="setFont('IBM Plex Sans Arabic','IBM Plex Sans Arabic')" data-font="IBM Plex Sans Arabic">
+            <div class="fo-name" style="font-family:'IBM Plex Sans Arabic'">IBM</div>
+            <div class="fo-label">IBM Plex</div>
+          </div>
+          <div class="font-opt" onclick="setFont('DM Sans','DM Sans')" data-font="DM Sans">
+            <div class="fo-name" style="font-family:'DM Sans'">Modern</div>
+            <div class="fo-label">DM Sans</div>
+          </div>
+          <div class="font-opt" onclick="setFont('Outfit','Outfit')" data-font="Outfit">
+            <div class="fo-name" style="font-family:'Outfit'">Outfit</div>
+            <div class="fo-label">Outfit</div>
+          </div>
+          <div class="font-opt" onclick="setFont('Syne','Syne')" data-font="Syne">
+            <div class="fo-name" style="font-family:'Syne'">Syne</div>
+            <div class="fo-label">Syne Bold</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="card">
+        <div class="card-t">🔐 <span id="lbl_passTitle">تغيير كلمة مرور الآدمن</span></div>
+        <div class="frow">
+          <div class="fg"><label class="fl" id="lbl_np">كلمة المرور الجديدة</label><input class="fi" type="password" id="sNP" placeholder="••••••••"></div>
+          <div class="fg"><label class="fl" id="lbl_cp">تأكيد كلمة المرور</label><input class="fi" type="password" id="sCP" placeholder="••••••••"></div>
+        </div>
+        <button class="btn btn-p btn-sm" onclick="changePass()" id="btn_changePass">تغيير كلمة المرور</button>
+      </div>
+      <div class="card"><div class="card-t" id="lbl_mgTitle">⊞ إدارة الأعمال</div><div id="mgList"></div></div>
+
+      <!-- Categories Manager -->
+      <div class="card">
+        <div class="card-t" id="lbl_catTitle">🏷 إدارة التصنيفات</div>
+        <div id="catList" style="margin-bottom:16px"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <input class="fi" id="newCatAr" placeholder="الاسم بالعربي" onkeydown="if(event.key==='Enter')addCat()">
+          <input class="fi" id="newCatEn" placeholder="Name in English" onkeydown="if(event.key==='Enter')addCat()">
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-p btn-sm" onclick="addCat()" id="btn_catAdd">+ إضافة</button>
+          <button class="btn btn-g btn-sm" onclick="resetCats()" style="font-size:11px">↺ إعادة الضبط</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><span id="tIc"></span> <span id="tMsg"></span></div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <div class="modal-hd"><div class="modal-title" id="mTitle"></div><button class="modal-x" onclick="closeModal()">✕</button></div>
+    <div id="mBody"></div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────
+let works    = JSON.parse(localStorage.getItem('pw_works')    || '[]');
+let settings = JSON.parse(localStorage.getItem('pw_settings') || '{}');
+let visits   = JSON.parse(localStorage.getItem('pw_visits')   || '[]');
+let imgData  = null;
+let isAdmin  = false;
+
+// ── INIT ──────────────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  if (!localStorage.getItem('pw_pass')) localStorage.setItem('pw_pass', 'admin123');
+  const sess = sessionStorage.getItem('pw_sess');
+  if (sess === 'admin') {
+    startApp(true);
+  } else if (sess === 'guest') {
+    startApp(false);
+  } else {
+    // first visit — show login screen
+    document.getElementById('loginScreen').classList.remove('gone');
+  }
+});
+
+function startApp(admin) {
+  document.getElementById('loginScreen').classList.add('gone');
+  document.getElementById('app').classList.add('visible');
+  isAdmin = admin;
+  // force reset if cats are broken (no proper ar/en)
+  if (!cats.length || !cats[0].ar || !cats[0].en) {
+    cats = DEFAULT_CATS;
+    saveCats();
+  }
+  applyAdminUI();
+  trackVisit();
+  applySettings();
+  applyFont();
+  applyProfile();
+  setLang(currentLang);
+  renderWorks();
+}
+
+// ── AUTH ──────────────────────────────────────────────────────────────
+function doLogin() {
+  const pass = document.getElementById('lPass').value;
+  if (pass === localStorage.getItem('pw_pass')) {
+    sessionStorage.setItem('pw_sess', 'admin');
+    startApp(true);
+    toast('⚡', 'مرحباً! أنت في وضع الآدمن');
+  } else {
+    const err = document.getElementById('lErr');
+    err.classList.add('show');
+    document.getElementById('lPass').value = '';
+    setTimeout(() => err.classList.remove('show'), 3000);
+  }
+}
+
+function guestIn() {
+  sessionStorage.setItem('pw_sess', 'guest');
+  startApp(false);
+}
+
+function showLogin() {
+  // show login screen on top of app
+  document.getElementById('lPass').value = '';
+  document.getElementById('lErr').classList.remove('show');
+  document.getElementById('loginScreen').classList.remove('gone');
+  sbClose();
+}
+
+function doLogout() {
+  sessionStorage.setItem('pw_sess', 'guest');
+  isAdmin = false;
+  applyAdminUI();
+  go('portfolio', 0);
+  toast('👋', 'تم تسجيل الخروج');
+}
+
+function applyAdminUI() {
+  // sidebar nav items
+  ['ni1','ni2','ni3','mgSec'].forEach(id => {
+    document.getElementById(id).style.display = isAdmin ? 'flex' : 'none';
+  });
+  document.getElementById('mgSec').style.display = isAdmin ? 'block' : 'none';
+  // admin panel vs login button in sidebar
+  document.getElementById('adminLoginBtn').style.display = isAdmin ? 'none' : 'block';
+  document.getElementById('adminPanel').style.display    = isAdmin ? 'block' : 'none';
+  // topbar
+  document.getElementById('tbLoginBtn').style.display   = isAdmin ? 'none' : 'flex';
+  document.getElementById('tbAdminBtns').style.display  = isAdmin ? 'flex' : 'none';
+  document.getElementById('tbAdminBadge').style.display = isAdmin ? 'inline-flex' : 'none';
+  // mobile
+  document.getElementById('mobLoginBtn').style.display  = isAdmin ? 'none' : 'flex';
+  // hero buttons
+  document.getElementById('heroAdminBtns').style.display = isAdmin ? 'flex' : 'none';
+}
+
+// ── VISIT ──────────────────────────────────────────────────────────────
+function trackVisit() {
+  const today = new Date().toISOString().split('T')[0];
+  const i = visits.findIndex(v => v.date === today);
+  if (i >= 0) visits[i].count++; else visits.push({ date: today, count: 1 });
+  if (visits.length > 30) visits = visits.slice(-30);
+  localStorage.setItem('pw_visits', JSON.stringify(visits));
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────
+function go(page, idx) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('on'));
+  document.getElementById('pg-' + page).classList.add('on');
+  const ni = document.getElementById('ni' + idx);
+  if (ni) ni.classList.add('on');
+  const labels = { portfolio:'أعمالي', upload:'رفع عمل', analytics:'التحليلات', settings:'الإعدادات' };
+  document.getElementById('crumbTxt').textContent = labels[page] || '';
+  if (page === 'analytics') renderAnalytics();
+  if (page === 'settings') { loadSettings(); renderManage(); renderCats(); }
+  sbClose();
+}
+
+// ── FILE ──────────────────────────────────────────────────────────────
+function onFile(e) { if (e.target.files[0]) readFile(e.target.files[0]); }
+function onDrop(e) { e.preventDefault(); document.getElementById('dz').classList.remove('drag'); if (e.dataTransfer.files[0]) readFile(e.dataTransfer.files[0]); }
+function readFile(f) {
+  const wrap = document.getElementById('prevWrap');
+  const content = document.getElementById('prevContent');
+  wrap.style.display = 'block';
+  if (f.type.startsWith('image/')) {
+    const r = new FileReader();
+    r.onload = ev => {
+      imgData = ev.target.result;
+      content.innerHTML = `<img src="${imgData}" style="width:100%;max-height:260px;object-fit:cover;display:block">`;
+    };
+    r.readAsDataURL(f);
+  } else {
+    imgData = null;
+    content.innerHTML = `<div style="padding:32px;text-align:center;font-size:36px;background:var(--s3)">📄<br><small style="font-size:13px;color:var(--sub)">${f.name}</small></div>`;
+  }
+  toast('✓', 'تم اختيار: ' + f.name);
+}
+function resetUpload() {
+  document.getElementById('iTitle').value = '';
+  document.getElementById('iDesc').value = '';
+  document.getElementById('prevWrap').style.display = 'none';
+  document.getElementById('fInput').value = '';
+  imgData = null;
+}
+
+// ── WORKS ──────────────────────────────────────────────────────────────
+function addWork() {
+  const title = document.getElementById('iTitle').value.trim();
+  if (!title) { toast('⚠', 'أدخل اسم العمل أولاً'); return; }
+  const w = { id: Date.now(), title, category: document.getElementById('iCat').value, desc: document.getElementById('iDesc').value.trim(), date: new Date().toLocaleDateString('ar-SA'), likes: 0, liked: false, img: imgData };
+  works.unshift(w); save(); resetUpload();
+  toast('✦', 'تم نشر العمل بنجاح');
+  setTimeout(() => go('portfolio', 0), 600);
+  renderWorks();
+}
+
+function renderWorks(filt = '') {
+  const grid = document.getElementById('wGrid');
+  const t = T[currentLang];
+  const list = filt ? works.filter(w => w.category === filt) : works;
+  const totalLikes = works.reduce((s,w) => s+w.likes, 0);
+  const totalVis   = visits.reduce((s,v) => s+v.count, 0);
+  const top = works.length ? works.reduce((a,b) => a.likes >= b.likes ? a : b) : null;
+  document.getElementById('stV').textContent = totalVis;
+  document.getElementById('stW').textContent = works.length;
+  document.getElementById('stL').textContent = totalLikes;
+  document.getElementById('stT').textContent = top ? top.title : '—';
+  document.getElementById('wCnt').textContent = list.length + t.worksCount;
+  document.getElementById('nbadge').textContent = works.length;
+  const em = { 'هوية بصرية':'🎨','موشن جرافيك':'🎬','تصميم UI':'💻','إعلانات':'📢','أخرى':'✦' };
+  // helper: get translated category label for a work
+  const getCatLabel = key => { const c = cats.find(x => x.ar === key); return c ? catLabel(c) : key; };
+  if (!list.length) {
+    grid.innerHTML = `<div class="empty"><div class="empty-ic">◈</div><div class="empty-t">${filt ? t.emptyTitleFilter : t.emptyTitle}</div><div class="empty-s">${t.emptySub}</div></div>`;
+    return;
+  }
+  grid.innerHTML = list.map(w => `
+    <div class="wcard">
+      <div class="wthumb" onclick="openModal(${w.id})">
+        ${w.img ? `<img src="${w.img}" alt="${w.title}">` : `<div class="wthumb-empty"><div class="t-icon">${em[w.category]||'✦'}</div><div class="t-lbl">${getCatLabel(w.category)}</div></div>`}
+        <div class="woverlay"><div class="ov-btn">${t.viewDetails}</div></div>
+      </div>
+      <div class="wbody">
+        <div class="wcat">${getCatLabel(w.category)}</div>
+        <div class="wtitle">${w.title}</div>
+        <div class="wdesc">${w.desc || t.noDesc}</div>
+        <div class="wmeta">
+          <button class="like-btn ${w.liked?'liked':''}" onclick="like(${w.id})" id="lb${w.id}">
+            ${w.liked?'♥':'♡'} <span id="lc${w.id}">${w.likes}</span>
+          </button>
+          <span class="wdate">${w.date}</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function filter(cat, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  renderWorks(cat);
+}
+
+function like(id) {
+  const w = works.find(x => x.id === id);
+  if (!w) return;
+  w.liked = !w.liked; w.likes += w.liked ? 1 : -1; save();
+  const btn = document.getElementById('lb' + id);
+  if (btn) { btn.className = 'like-btn' + (w.liked ? ' liked' : ''); btn.innerHTML = `${w.liked?'♥':'♡'} <span id="lc${id}">${w.likes}</span>`; }
+  document.getElementById('stL').textContent = works.reduce((s,x)=>s+x.likes,0);
+  const top = works.length ? works.reduce((a,b) => a.likes>=b.likes?a:b) : null;
+  document.getElementById('stT').textContent = top ? top.title : '—';
+}
+
+function openModal(id) {
+  const w = works.find(x => x.id === id);
+  if (!w) return;
+  document.getElementById('mTitle').textContent = w.title;
+  document.getElementById('mBody').innerHTML = `
+    ${w.img ? `<img src="${w.img}" style="width:100%;border-radius:12px;margin-bottom:16px;max-height:320px;object-fit:cover">` : ''}
+    <div style="display:inline-block;font-size:11px;color:var(--accent2);background:rgba(108,99,255,.1);padding:3px 10px;border-radius:6px;margin-bottom:12px">${w.category}</div>
+    <div style="font-size:14px;color:var(--sub);line-height:1.8;margin-bottom:16px">${w.desc || 'لا يوجد وصف'}</div>
+    <div style="display:flex;gap:16px;font-size:13px;color:var(--muted)"><span>📅 ${w.date}</span><span style="color:var(--red)">♥ ${w.likes} إعجاب</span></div>`;
+  document.getElementById('modal').classList.add('on');
+}
+function closeModal() { document.getElementById('modal').classList.remove('on'); }
+document.getElementById('modal').addEventListener('click', e => { if(e.target.id==='modal') closeModal(); });
+
+// ── ANALYTICS ──────────────────────────────────────────────────────────
+function renderAnalytics() {
+  const days = [];
+  for (let i=6;i>=0;i--) {
+    const d = new Date(); d.setDate(d.getDate()-i);
+    const key = d.toISOString().split('T')[0];
+    const found = visits.find(v => v.date === key);
+    days.push({ label:['أحد','اثن','ثلا','أرب','خمس','جمع','سبت'][d.getDay()], val: found ? found.count : 0 });
+  }
+  const max = Math.max(...days.map(d=>d.val), 1);
+  document.getElementById('barChart').innerHTML = days.map(d => `<div class="bar-col"><div class="bar-track"><div class="bar-fill" style="height:${Math.max((d.val/max)*140,4)}px" title="${d.val} زيارة"></div></div><div class="bar-day">${d.label}</div></div>`).join('');
+  document.getElementById('dNum').textContent = works.length;
+  const cats = {};
+  works.forEach(w => cats[w.category] = (cats[w.category]||0)+1);
+  const colors = ['#6c63ff','#00d4ff','#ff4d6d','#00e5a0','#ffaa00'];
+  const total = works.length||1;
+  document.getElementById('dLeg').innerHTML = Object.entries(cats).map(([k,v],i) => `<div class="leg-row"><div class="leg-left"><div class="leg-dot" style="background:${colors[i%5]}"></div>${k}</div><div class="leg-cnt">${v} (${Math.round(v/total*100)}%)</div></div>`).join('') || '<div style="color:var(--muted);font-size:13px;text-align:center;padding:16px">لا توجد أعمال</div>';
+  const tb = document.getElementById('wTbl');
+  tb.innerHTML = works.length ? works.map(w => `<tr><td>${w.title}</td><td><span class="td-cat">${w.category}</span></td><td class="td-lk">♥ ${w.likes}</td><td style="color:var(--muted)">${w.date}</td></tr>`).join('') : '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:36px">لا توجد أعمال</td></tr>';
+}
+
+// ── SETTINGS ──────────────────────────────────────────────────────────
+function loadSettings() {
+  document.getElementById('sName').value = settings.name || '';
+  document.getElementById('sTag').value  = settings.tag  || '';
+  document.getElementById('sPh').value   = settings.ph   || '';
+  document.getElementById('sEm').value   = settings.em   || '';
+  const curFont = settings.font || 'Cairo';
+  document.querySelectorAll('.font-opt').forEach(o => o.classList.toggle('on', o.dataset.font === curFont));
+  applyProfile();
+  renderCats();
+}
+function saveSettings() {
+  // preserve font and profileImg — only update text fields
+  settings.name = document.getElementById('sName').value.trim();
+  settings.tag  = document.getElementById('sTag').value.trim();
+  settings.ph   = document.getElementById('sPh').value.trim();
+  settings.em   = document.getElementById('sEm').value.trim();
+  localStorage.setItem('pw_settings', JSON.stringify(settings));
+  applySettings(); toast('✓', currentLang === 'ar' ? 'تم حفظ الإعدادات' : 'Settings saved');
+}
+function applySettings() {
+  if (settings.name) {
+    document.getElementById('sbName').textContent = settings.name;
+    document.getElementById('hName').textContent  = settings.name;
+    document.getElementById('mobName').textContent = settings.name;
+    // hide "الإبداعية" subtitle when user has set their own name
+    document.getElementById('hTitleSub').style.display = 'none';
+  } else {
+    document.getElementById('hTitleSub').style.display = '';
+  }
+  if (settings.tag)  { document.getElementById('hTagline').textContent = settings.tag; }
+  if (settings.ph)   { document.getElementById('phTxt').textContent = settings.ph; document.getElementById('sbPhone').href = 'tel:'+settings.ph; }
+  if (settings.em)   { document.getElementById('emTxt').textContent = settings.em; document.getElementById('sbEmail').href = 'mailto:'+settings.em; }
+}
+function changePass() {
+  const np = document.getElementById('sNP').value;
+  const cp = document.getElementById('sCP').value;
+  if (!np) { toast('⚠','أدخل كلمة المرور الجديدة'); return; }
+  if (np !== cp) { toast('⚠','كلمتا المرور غير متطابقتين'); return; }
+  if (np.length < 6) { toast('⚠','كلمة المرور يجب أن تكون 6 أحرف على الأقل'); return; }
+  localStorage.setItem('pw_pass', np);
+  document.getElementById('sNP').value = '';
+  document.getElementById('sCP').value = '';
+  toast('🔐','تم تغيير كلمة المرور بنجاح');
+}
+function renderManage() {
+  const el = document.getElementById('mgList');
+  if (!works.length) { el.innerHTML = '<div style="color:var(--muted);font-size:14px">لا توجد أعمال</div>'; return; }
+  el.innerHTML = works.map(w => `<div class="mrow"><div class="mthumb">${w.img?`<img src="${w.img}">`:'🎨'}</div><div class="minfo"><div class="mname">${w.title}</div><div class="mmeta">${w.category} · ♥${w.likes} · ${w.date}</div></div><button class="btn btn-danger btn-sm" onclick="delWork(${w.id})">حذف</button></div>`).join('');
+}
+function delWork(id) { works = works.filter(w => w.id !== id); save(); renderManage(); renderWorks(); toast('🗑','تم حذف العمل'); }
+
+// ── CATEGORIES ────────────────────────────────────────────────────────
+const DEFAULT_CATS = [
+  { ar: 'هوية بصرية',  en: 'Branding'    },
+  { ar: 'موشن جرافيك', en: 'Motion'       },
+  { ar: 'تصميم UI',    en: 'UI Design'    },
+  { ar: 'إعلانات',     en: 'Advertising'  },
+  { ar: 'أخرى',        en: 'Other'        },
+];
+
+function loadCats() {
+  const raw = localStorage.getItem('pw_cats_v2');
+  if (!raw) return DEFAULT_CATS;
+  try {
+    const parsed = JSON.parse(raw);
+    // validate: must be array of objects with ar and en
+    if (!Array.isArray(parsed) || !parsed.length) return DEFAULT_CATS;
+    if (typeof parsed[0] === 'string') {
+      // old format — migrate
+      return parsed.map(c => ({ ar: c, en: c }));
+    }
+    if (typeof parsed[0] !== 'object' || !parsed[0].ar || !parsed[0].en) return DEFAULT_CATS;
+    return parsed;
+  } catch(e) { return DEFAULT_CATS; }
+}
+
+let cats = loadCats();
+
+function saveCats() { localStorage.setItem('pw_cats_v2', JSON.stringify(cats)); }
+function catLabel(c) { return currentLang === 'ar' ? c.ar : c.en; }
+function catKey(c)   { return c.ar; }
+
+function renderCats() {
+  const list = document.getElementById('catList');
+  if (!list) return;
+  const t = T[currentLang];
+  if (!cats.length) {
+    list.innerHTML = `<div style="color:var(--muted);font-size:13px">${t.noWorks}</div>`;
+  } else {
+    list.innerHTML = cats.map((c,i) => `
+      <div style="display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--border)">
+        <div style="flex:1">
+          <div style="font-size:14px;color:var(--text)">${c.ar}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">${c.en}</div>
+        </div>
+        <button class="btn btn-g btn-sm" style="padding:5px 10px;font-size:12px" onclick="moveCat(${i},-1)" ${i===0?'disabled':''}>↑</button>
+        <button class="btn btn-g btn-sm" style="padding:5px 10px;font-size:12px" onclick="moveCat(${i},1)" ${i===cats.length-1?'disabled':''}>↓</button>
+        <button class="btn btn-danger btn-sm" style="padding:5px 10px;font-size:12px" onclick="delCat(${i})">✕</button>
+      </div>`).join('');
+  }
+  syncCatsUI();
+}
+
+function addCat() {
+  const arInput = document.getElementById('newCatAr');
+  const enInput = document.getElementById('newCatEn');
+  const arVal = arInput ? arInput.value.trim() : '';
+  const enVal = enInput ? enInput.value.trim() : '';
+  if (!arVal || !enVal) {
+    toast('⚠', currentLang === 'ar' ? 'أدخل الاسم بالعربي والإنجليزي' : 'Enter name in both Arabic and English');
+    return;
+  }
+  if (cats.find(c => c.ar === arVal)) {
+    toast('⚠', currentLang === 'ar' ? 'التصنيف موجود مسبقاً' : 'Category already exists');
+    return;
+  }
+  cats.push({ ar: arVal, en: enVal });
+  saveCats(); renderCats();
+  arInput.value = ''; enInput.value = '';
+  toast('✦', currentLang === 'ar' ? 'تمت إضافة التصنيف' : 'Category added');
+}
+
+function delCat(i) {
+  cats.splice(i, 1);
+  saveCats(); renderCats();
+  toast('🗑', currentLang === 'ar' ? 'تم حذف التصنيف' : 'Category removed');
+}
+
+function resetCats() {
+  cats = DEFAULT_CATS;
+  saveCats(); renderCats();
+  syncCatsUI();
+  toast('↺', currentLang === 'ar' ? 'تم إعادة ضبط التصنيفات' : 'Categories reset');
+}
+
+function moveCat(i, dir) {
+  const j = i + dir;
+  if (j < 0 || j >= cats.length) return;
+  [cats[i], cats[j]] = [cats[j], cats[i]];
+  saveCats(); renderCats();
+}
+
+function syncCatsUI() {
+  // filter tabs — show translated label, filter by Arabic key
+  const tabsEl = document.querySelector('.tabs');
+  const allLabel = currentLang === 'ar' ? 'الكل' : 'All';
+  tabsEl.innerHTML = `<div class="tab on" onclick="filter('',this)">${allLabel}</div>` +
+    cats.map(c => `<div class="tab" onclick="filter('${catKey(c)}',this)">${catLabel(c)}</div>`).join('');
+  // upload select — value is Arabic key, display is translated
+  const sel = document.getElementById('iCat');
+  if (sel) sel.innerHTML = cats.map(c => `<option value="${catKey(c)}">${catLabel(c)}</option>`).join('');
+}
+
+// ── PROFILE IMAGE ──────────────────────────────────────────────────────
+function uploadProfile(e) {
+  const f = e.target.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    settings.profileImg = ev.target.result;
+    localStorage.setItem('pw_settings', JSON.stringify(settings));
+    applyProfile();
+    toast('✓', currentLang === 'ar' ? 'تم رفع الصورة' : 'Photo uploaded');
+  };
+  r.readAsDataURL(f);
+}
+function removeProfile() {
+  delete settings.profileImg;
+  localStorage.setItem('pw_settings', JSON.stringify(settings));
+  applyProfile();
+}
+function applyProfile() {
+  const img = settings.profileImg;
+  // hero
+  if (img) {
+    document.getElementById('heroProfileImg').src = img;
+    document.getElementById('heroProfileImg').style.display = 'block';
+    document.getElementById('heroProfileEmpty').style.display = 'none';
+    document.getElementById('heroEl').classList.add('has-profile');
+  } else {
+    document.getElementById('heroProfileImg').style.display = 'none';
+    document.getElementById('heroProfileEmpty').style.display = 'flex';
+    document.getElementById('heroEl').classList.remove('has-profile');
+  }
+  // settings preview
+  const prev = document.getElementById('profilePreview');
+  const placeholder = document.getElementById('profilePlaceholder');
+  const removeBtn = document.getElementById('removeProfileBtn');
+  if (img) {
+    prev.src = img; prev.style.display = 'block';
+    placeholder.style.display = 'none';
+    removeBtn.style.display = 'flex';
+  } else {
+    prev.style.display = 'none';
+    placeholder.style.display = 'flex';
+    removeBtn.style.display = 'none';
+  }
+}
+
+// ── FONT PICKER ────────────────────────────────────────────────────────
+const fonts = {
+  'Cairo': "'Cairo', sans-serif",
+  'Tajawal': "'Tajawal', sans-serif",
+  'IBM Plex Sans Arabic': "'IBM Plex Sans Arabic', sans-serif",
+  'DM Sans': "'DM Sans', sans-serif",
+  'Outfit': "'Outfit', sans-serif",
+  'Syne': "'Syne', sans-serif",
+};
+function setFont(key) {
+  settings.font = key;
+  localStorage.setItem('pw_settings', JSON.stringify(settings));
+  applyFont();
+  toast('🔤', currentLang === 'ar' ? 'تم تغيير الخط' : 'Font changed');
+}
+function applyFont() {
+  const key = settings.font || 'Cairo';
+  const f = fonts[key] || "'Cairo', sans-serif";
+  // inject a style tag so it overrides everything
+  let st = document.getElementById('fontOverride');
+  if (!st) { st = document.createElement('style'); st.id = 'fontOverride'; document.head.appendChild(st); }
+  st.textContent = `*:not(.fo-name):not(#loginScreen *) { font-family: ${f} !important; }`;
+  document.querySelectorAll('.font-opt').forEach(o => o.classList.toggle('on', o.dataset.font === key));
+}
+
+// ── LANGUAGE ───────────────────────────────────────────────────────────
+let currentLang = localStorage.getItem('pw_lang') || 'ar';
+
+const T = {
+  ar: {
+    portfolio: 'أعمالي', upload: 'رفع عمل', analytics: 'التحليلات', settings: 'الإعدادات',
+    heroSub: 'الإبداعية',
+    tagline: 'مصمم إبداعي متخصص في الهوية البصرية والجرافيك ديزاين',
+    addWork: '+ أضف عمل', reports: '◈ التقارير',
+    allWorks: 'الكل', identity: 'هوية بصرية', motion: 'موشن جرافيك', ui: 'تصميم UI', ads: 'إعلانات', other: 'أخرى',
+    visits: '👁 إجمالي الزيارات', published: '⊞ الأعمال المنشورة', likes: '♥ إجمالي الإعجابات', topWork: '🏆 أعلى إعجاباً',
+    autoUpdate: '↑ يتحدث تلقائياً', inGallery: '↑ في المعرض', fromVisitors: '↑ من الزوار', mostEngaged: 'الأكثر تفاعلاً',
+    works: 'الأعمال', worksCount: ' عمل',
+    dragHere: 'اسحب ملفك هنا', filesTypes: 'صور، فيديو، PDF، ملفات تصميم', chooseFile: 'اختر ملف',
+    workDetails: '⊞ تفاصيل العمل', workName: 'اسم العمل *', category: 'الفئة', desc: 'الوصف',
+    publish: '✦ نشر العمل', clear: 'مسح',
+    backToGallery: '← الرجوع للمعرض',
+    adminLogin: '🔐 دخول كآدمن', logout: '🚪 تسجيل الخروج', youreAdmin: '⚡ أنت الآدمن',
+    noDesc: 'لا يوجد وصف', viewDetails: '👁 عرض التفاصيل', likes2: ' إعجاب',
+    emptyTitle: 'لا توجد أعمال بعد', emptyTitleFilter: 'لا توجد أعمال في هذه الفئة', emptySub: 'ابدأ بإضافة أول عمل',
+    navMenu: 'القائمة', navMgmt: 'الإدارة',
+    profilePhoto: '🖼 صورة العرض الشخصية', uploadPhoto: 'اضغط لرفع صورتك الشخصية', removePhoto: '🗑 حذف الصورة',
+    personalInfo: '◎ المعلومات الشخصية', nameLbl: 'الاسم / المسمى المهني', tagLbl: 'التخصص',
+    phLbl: 'رقم التواصل', emLbl: 'البريد الإلكتروني', saveBtn: 'حفظ التغييرات',
+    fontTitle: '🔤 اختر الخط', passTitle: 'تغيير كلمة مرور الآدمن',
+    newPass: 'كلمة المرور الجديدة', confirmPass: 'تأكيد كلمة المرور', changePassBtn: 'تغيير كلمة المرور',
+    mgTitle: '⊞ إدارة الأعمال', deleteBtn: 'حذف', noWorks: 'لا توجد أعمال',
+    loginTitle: 'مرحباً بك', loginSub: 'اختر طريقة الدخول — الآدمن يملك صلاحيات كاملة، الزائر يشوف المعرض فقط',
+    loginBtn: '⚡ دخول كآدمن', guestBtn: '👁 تصفح كزائر', wrongPass: '❌ كلمة المرور غير صحيحة',
+    passLabel: 'كلمة مرور الآدمن',
+    uploadBtn: '+ رفع عمل', reportsBtn: '◈ التقارير',
+    catTitle: '🏷 إدارة التصنيفات', catPlaceholder: 'اسم التصنيف الجديد', catAdd: '+ إضافة',
+    analyticsTitle: '📈 الزيارات — آخر 7 أيام', donutTitle: '◎ توزيع الأعمال',
+    tableTitle: '⊞ تفاصيل الأعمال والتفاعل',
+    thWork: 'العمل', thCat: 'الفئة', thLikes: 'الإعجابات', thDate: 'التاريخ',
+    noWorksTable: 'لا توجد أعمال',
+    closeBtn: 'إغلاق', changePhoto: 'تغيير الصورة',
+    crumbPortfolio: 'أعمالي', crumbUpload: 'رفع عمل', crumbAnalytics: 'التحليلات', crumbSettings: 'الإعدادات',
+    sectionWorks: 'الأعمال',
+    noPhone: 'لم يُضف رقم بعد', noEmail: 'لم يُضف إيميل بعد',
+    studioLabel: 'Studio',
+    heroTag: '✦ Creative Portfolio',
+    adminBadge: '⚡ آدمن',
+  },
+  en: {
+    portfolio: 'Portfolio', upload: 'Upload Work', analytics: 'Analytics', settings: 'Settings',
+    heroSub: 'Creative Works',
+    tagline: 'Creative designer specialized in visual identity and graphic design',
+    addWork: '+ Add Work', reports: '◈ Reports',
+    allWorks: 'All', identity: 'Branding', motion: 'Motion', ui: 'UI Design', ads: 'Advertising', other: 'Other',
+    visits: '👁 Total Visits', published: '⊞ Published Works', likes: '♥ Total Likes', topWork: '🏆 Top Liked',
+    autoUpdate: '↑ Auto updated', inGallery: '↑ In gallery', fromVisitors: '↑ From visitors', mostEngaged: 'Most engaged',
+    works: 'Works', worksCount: ' works',
+    dragHere: 'Drag your file here', filesTypes: 'Images, video, PDF, design files', chooseFile: 'Choose file',
+    workDetails: '⊞ Work Details', workName: 'Work title *', category: 'Category', desc: 'Description',
+    publish: '✦ Publish Work', clear: 'Clear',
+    backToGallery: '← Back to Gallery',
+    adminLogin: '🔐 Admin Login', logout: '🚪 Sign Out', youreAdmin: '⚡ You are Admin',
+    noDesc: 'No description', viewDetails: '👁 View Details', likes2: ' likes',
+    emptyTitle: 'No works yet', emptyTitleFilter: 'No works in this category', emptySub: 'Start by adding your first work',
+    navMenu: 'Menu', navMgmt: 'Management',
+    profilePhoto: '🖼 Profile Photo', uploadPhoto: 'Click to upload your photo', removePhoto: '🗑 Remove Photo',
+    personalInfo: '◎ Personal Information', nameLbl: 'Name / Title', tagLbl: 'Specialty',
+    phLbl: 'Phone Number', emLbl: 'Email Address', saveBtn: 'Save Changes',
+    fontTitle: '🔤 Choose Font', passTitle: 'Change Admin Password',
+    newPass: 'New Password', confirmPass: 'Confirm Password', changePassBtn: 'Change Password',
+    mgTitle: '⊞ Manage Works', deleteBtn: 'Delete', noWorks: 'No works yet',
+    loginTitle: 'Welcome', loginSub: 'Choose how to enter — Admin has full access, visitors can browse the gallery',
+    loginBtn: '⚡ Admin Login', guestBtn: '👁 Browse as Guest', wrongPass: '❌ Incorrect password',
+    passLabel: 'Admin Password',
+    uploadBtn: '+ Upload Work', reportsBtn: '◈ Reports',
+    catTitle: '🏷 Manage Categories', catPlaceholder: 'New category name', catAdd: '+ Add',
+    analyticsTitle: '📈 Visits — Last 7 days', donutTitle: '◎ Works Distribution',
+    tableTitle: '⊞ Works & Engagement Details',
+    thWork: 'Work', thCat: 'Category', thLikes: 'Likes', thDate: 'Date',
+    noWorksTable: 'No works yet',
+    closeBtn: 'Close', changePhoto: 'Change Photo',
+    crumbPortfolio: 'Portfolio', crumbUpload: 'Upload', crumbAnalytics: 'Analytics', crumbSettings: 'Settings',
+    sectionWorks: 'Works',
+    noPhone: 'No phone added', noEmail: 'No email added',
+    studioLabel: 'Studio',
+    heroTag: '✦ Creative Portfolio',
+    adminBadge: '⚡ Admin',
+  }
+};
+
+function setLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('pw_lang', lang);
+  const isAr = lang === 'ar';
+  document.documentElement.lang = lang;
+  document.documentElement.dir  = isAr ? 'rtl' : 'ltr';
+  // topbar toggles
+  document.getElementById('langAr').classList.toggle('on', isAr);
+  document.getElementById('langEn').classList.toggle('on', !isAr);
+  // sidebar toggles
+  document.getElementById('sbLangAr').classList.toggle('on', isAr);
+  document.getElementById('sbLangEn').classList.toggle('on', !isAr);
+  applyTranslations();
+}
+
+function applyTranslations() {
+  const t = T[currentLang];
+  const isAr = currentLang === 'ar';
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  const setQ = (sel, val) => { const el = document.querySelector(sel); if (el) el.textContent = val; };
+  const setQA = (sel, i, val) => { const els = document.querySelectorAll(sel); if (els[i]) els[i].textContent = val; };
+
+  // Login
+  setQ('.l-title', t.loginTitle);
+  setQ('.l-sub', t.loginSub);
+  set('lErr', t.wrongPass);
+  setQ('.l-label', t.passLabel);
+  const loginBtns = document.querySelectorAll('#loginScreen button');
+  if (loginBtns[0]) loginBtns[0].textContent = t.loginBtn;
+  if (loginBtns[1]) loginBtns[1].textContent = t.guestBtn;
+
+  // Sidebar nav
+  setQ('#ni0 .nav-txt', t.portfolio);
+  setQ('#ni1 .nav-txt', t.upload);
+  setQ('#ni2 .nav-txt', t.analytics);
+  setQ('#ni3 .nav-txt', t.settings);
+  set('ns0', t.navMenu);
+  set('mgSec', t.navMgmt);
+  set('adminLoginBtnInner', t.adminLogin);
+  set('abadgeTxt', t.youreAdmin);
+  set('logoutBtnTxt', t.logout);
+  if (!settings.ph) set('phTxt', t.noPhone);
+  if (!settings.em) set('emTxt', t.noEmail);
+
+  // Topbar
+  set('tbLoginBtn', t.adminLogin);
+  set('tb_reports', t.reportsBtn);
+  set('tb_upload', t.uploadBtn);
+  set('tbAdminBadge', t.adminBadge);
+  set('mobLoginBtn', isAr ? '🔐 دخول' : '🔐 Login');
+  const crumb = document.querySelector('.crumb');
+  const crumbTxt = document.getElementById('crumbTxt');
+  if (crumb && crumbTxt) crumb.innerHTML = t.studioLabel + ' <span>/ <span id="crumbTxt">' + crumbTxt.textContent + '</span></span>';
+
+  // Hero
+  set('hTitleSub', t.heroSub);
+  setQ('.hero-tag', t.heroTag);
+  if (!settings.tag) set('hTagline', t.tagline);
+  set('btnAddWork', t.addWork);
+  set('btnReports', t.reports);
+
+  // Stats
+  setQA('.stat-lbl', 0, t.visits);
+  setQA('.stat-lbl', 1, t.published);
+  setQA('.stat-lbl', 2, t.likes);
+  setQA('.stat-lbl', 3, t.topWork);
+  setQA('.stat-sub', 0, t.autoUpdate);
+  setQA('.stat-sub', 1, t.inGallery);
+  setQA('.stat-sub', 2, t.fromVisitors);
+  setQA('.stat-sub', 3, t.mostEngaged);
+
+  // Section title
+  const secTitle = document.querySelector('.sec-title');
+  if (secTitle && secTitle.childNodes[0]) secTitle.childNodes[0].textContent = t.sectionWorks + ' ';
+
+  // Upload page
+  setQ('.dz-t', t.dragHere);
+  setQ('.dz-s', t.filesTypes);
+  setQ('#dz .btn', t.chooseFile);
+  setQA('#pg-upload .card-t', 0, t.workDetails);
+  setQA('#pg-upload .fl', 0, t.workName);
+  setQA('#pg-upload .fl', 1, t.category);
+  setQA('#pg-upload .fl', 2, t.desc);
+  setQ('#pg-upload .btn-p', t.publish);
+  setQ('#pg-upload .btn-g', t.clear);
+
+  // Analytics page
+  setQ('#pg-analytics .btn-g', t.backToGallery);
+  setQA('#pg-analytics .card-t', 0, t.analyticsTitle);
+  setQA('#pg-analytics .card-t', 1, t.donutTitle);
+  setQA('#pg-analytics .card-t', 2, t.tableTitle);
+  setQA('#pg-analytics .dtable th', 0, t.thWork);
+  setQA('#pg-analytics .dtable th', 1, t.thCat);
+  setQA('#pg-analytics .dtable th', 2, t.thLikes);
+  setQA('#pg-analytics .dtable th', 3, t.thDate);
+
+  // Settings page
+  setQA('#pg-settings .card-t', 0, t.profilePhoto);
+  setQA('#pg-settings .card-t', 1, t.personalInfo);
+  setQA('#pg-settings .card-t', 3, '🔐 ' + t.passTitle);
+  setQ('.profile-img-placeholder span', t.uploadPhoto);
+  set('removeProfileBtn', t.removePhoto);
+  setQ('.profile-img-overlay div:last-child', t.changePhoto);
+  set('lbl_name', t.nameLbl);
+  set('lbl_tag', t.tagLbl);
+  set('lbl_ph', t.phLbl);
+  set('lbl_em', t.emLbl);
+  set('btn_saveSettings', t.saveBtn);
+  set('lbl_fontTitle', t.fontTitle);
+  set('lbl_passTitle', t.passTitle);
+  set('lbl_np', t.newPass);
+  set('lbl_cp', t.confirmPass);
+  set('btn_changePass', t.changePassBtn);
+  set('lbl_mgTitle', t.mgTitle);
+  set('lbl_catTitle', t.catTitle);
+  set('btn_catAdd', t.catAdd);
+  const catAr = document.getElementById('newCatAr');
+  const catEn = document.getElementById('newCatEn');
+  if (catAr) catAr.placeholder = isAr ? 'الاسم بالعربي' : 'Arabic name';
+  if (catEn) catEn.placeholder = isAr ? 'الاسم بالإنجليزي' : 'English name';
+
+  // Sync categories tabs + re-render works
+  syncCatsUI();
+  renderWorks();
+}
+
+
+// ── MOBILE SIDEBAR ──────────────────────────────────────────────────────
+function sbOpen()  { document.getElementById('sb').classList.add('open'); document.getElementById('sbOverlay').classList.add('show'); }
+function sbClose() { document.getElementById('sb').classList.remove('open'); document.getElementById('sbOverlay').classList.remove('show'); }
+
+// ── HELPERS ──────────────────────────────────────────────────────────
+function save() { localStorage.setItem('pw_works', JSON.stringify(works)); }
+function toast(ic, msg) {
+  document.getElementById('tIc').textContent  = ic;
+  document.getElementById('tMsg').textContent = msg;
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>
